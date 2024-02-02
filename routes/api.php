@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\BranchController;
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -24,9 +26,19 @@ Route::prefix('auth')->group(function () {
     Route::post('/signup', [AuthController::class, 'signup'])->name('auth.signup');
     Route::post('/login', [AuthController::class, 'login'])->name('auth.login');
 
-
 });
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::prefix('user')->group(function () {
+        Route::get('/', [UserController::class, 'index'])->name('users.index');
+        Route::get('/{user}', [UserController::class, 'show'])->name('users.show');
+
+        Route::post('/create', [UserController::class, 'store'])->name('users.store');
+
+    });
+    Route::prefix('branch')->group(function () {
+        Route::get('/', [BranchController::class, 'index'])->name('branches.index');
+        Route::post('/create', [BranchController::class, 'store'])->name('branches.store');
+    });
 });

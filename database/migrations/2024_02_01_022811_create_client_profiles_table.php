@@ -11,9 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('user_profiles', function (Blueprint $table) {
+        Schema::create('client_profiles', function (Blueprint $table) {
             $table->id();
-
             $table->string('first_name');
             $table->string('middle_name')->nullable();
             $table->string('last_name');
@@ -29,19 +28,12 @@ return new class extends Migration
 
             $table->string('phone')->unique();
 
-            $table->string('emergency_name')->nullable();
-            $table->string('emergency_phone')->unique()->nullable();
-            $table->string('emergency_relationship')->unique()->nullable();
+            $table->date('date_of_birth')->nullable();
+            $table->date('date_of_first_visit')->nullable();
 
-            $table->date('date_of_birth');
-            $table->date('date_of_hire');
-            $table->date('last_work_date')->nullable();
+            $table->integer('number_of_visits')->default(0);
 
-            $table->string('nss')->unique()->nullable();
-
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('branch_id')->constrained()->cascadeOnDelete();
-
+            $table->foreignId('client_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
     }
@@ -51,6 +43,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('user_profiles');
+        Schema::dropIfExists('client_profiles');
     }
 };
