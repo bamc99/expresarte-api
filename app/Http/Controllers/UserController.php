@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Users\StoreUserRequest;
+use App\Http\Requests\Users\UpdateUserProfileRequest;
+use App\Http\Requests\Users\UpdateUserRequest;
 use App\Models\User;
 use App\Models\UserProfile;
 use Illuminate\Http\Request;
@@ -76,7 +78,7 @@ class UserController extends Controller
         DB::beginTransaction();
         try {
             $newUser = new User([
-                'name' => $userData['first_name'].' '.$userData['last_name'],
+                'name' => $userData['first_name'] . ' ' . $userData['last_name'],
                 'verification_token' => $token,
                 'email' => $userData['email'],
                 'password' => Hash::make($userData['password']),
@@ -130,7 +132,6 @@ class UserController extends Controller
             'message' => 'Usuario registrado exitosamente',
             'data' => $newUser,
         ], 200);
-
     }
 
     /**
@@ -140,15 +141,60 @@ class UserController extends Controller
     {
         $user->load(['profile', 'profile.branch']);
 
+
         return response()->json(['user' => $user], 200);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, User $user)
+    public function update(UpdateUserRequest $request, User $user)
     {
-        //
+
+        $userData = $request->validated();
+        DB::beginTransaction();
+        try {
+            $user->update($userData);
+
+            // Actualizar datos relacionados
+            if (isset($userData['branch_id'])) {
+                $user->profile()->update($userData['branch_id']);
+            }
+
+            if (isset($userData['roles'])) {
+                $user->roles()->sync($userData['roles']);
+            }
+
+            DB::commit();
+        } catch (\Throwable $th) {
+            DB::rollback();
+            return response()->json(['error' => 'Error al actualizar el usuario', 'errors' => $th->getMessage()], 500);
+        }
+        return response()->json(['message' => 'Usuario actualizado exitosamente', 'user' => $user], 200);
+    }
+
+    public function updateProfile(UpdateUserProfileRequest $request, User $user)
+    {
+        $profileData = $request->validated();
+
+        // Comprobar si el usuario tiene un perfil
+        if (!$user->profile) {
+            // Si no tiene un perfil, crea uno
+            $profile = new UserProfile($profileData);
+            $user->profile()->save($profile);
+        } else {
+            // Si ya tiene un perfil, actualiza los datos
+            DB::beginTransaction();
+            try {
+                $user->profile()->update($profileData);
+                DB::commit();
+            } catch (\Throwable $th) {
+                DB::rollback();
+                return response()->json(['error' => 'Error al actualizar el perfil', 'errors' => $th->getMessage()], 500);
+            }
+        }
+    
+        return response()->json(['message' => 'Perfil actualizado exitosamente', 'user' => $user], 200);
     }
 
     /**

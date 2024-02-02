@@ -30,8 +30,8 @@ return new class extends Migration
             $table->string('phone')->unique();
 
             $table->string('emergency_name')->nullable();
-            $table->string('emergency_phone')->unique()->nullable();
-            $table->string('emergency_relationship')->unique()->nullable();
+            $table->string('emergency_phone')->nullable();
+            $table->string('emergency_relationship')->nullable();
 
             $table->date('date_of_birth');
             $table->date('date_of_hire');
