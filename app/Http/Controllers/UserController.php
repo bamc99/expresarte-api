@@ -5,12 +5,14 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Users\StoreUserRequest;
 use App\Http\Requests\Users\UpdateUserProfileRequest;
 use App\Http\Requests\Users\UpdateUserRequest;
+use App\Models\Attachment;
 use App\Models\User;
 use App\Models\UserProfile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
@@ -177,14 +179,26 @@ class UserController extends Controller
     {
         $profileData = $request->validated();
 
+        DB::beginTransaction();
         // Comprobar si el usuario tiene un perfil
         if (!$user->profile) {
             // Si no tiene un perfil, crea uno
-            $profile = new UserProfile($profileData);
-            $user->profile()->save($profile);
+            try {
+                $profile = new UserProfile($profileData);
+                $profile->save();
+
+                DB::commit();
+
+            } catch (\Throwable $th) {
+                DB::rollback();
+                return response()->json(['error' => 'Error al crear el perfil', 'errors' => $th->getMessage()], 500);
+
+            }
+            
+            
         } else {
             // Si ya tiene un perfil, actualiza los datos
-            DB::beginTransaction();
+            
             try {
                 $user->profile()->update($profileData);
                 DB::commit();
@@ -193,8 +207,41 @@ class UserController extends Controller
                 return response()->json(['error' => 'Error al actualizar el perfil', 'errors' => $th->getMessage()], 500);
             }
         }
-    
+
         return response()->json(['message' => 'Perfil actualizado exitosamente', 'user' => $user], 200);
+    }
+
+    public function uploadProfileImage(Request $request)
+    {
+        $file = $request->file('image');
+        $originalName = $file->getClientOriginalName();
+        $mime = $file->getClientMimeType();
+        $extension = $file->getClientOriginalExtension();
+        $size = $file->getSize();
+        $hash = hash_file('md5', $file->getRealPath());
+
+        $name = Str::uuid();
+        $pathToSave = "users/profile-images/";
+        $diskToSave = "public";
+
+        $attachment = Attachment::create([
+            'name' => $name,
+            'original_name' => $originalName,
+            'mime' => $mime,
+            'extension' => $extension,
+            'size' => $size,
+            'sort' => 0,
+            'path' => $pathToSave,
+            'description' => null,
+            'alt' => null,
+            'hash' => $hash,
+            'disk' => $diskToSave,
+            'group' => null,
+        ]);
+
+        $attachment->uploadFile($file);
+
+        return $attachment;
     }
 
     /**

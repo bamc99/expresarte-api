@@ -71,28 +71,14 @@ class ClientController extends Controller
                 'name' => $clientData['first_name'] . ' ' . $clientData['last_name'],
                 'verification_token' => $token,
                 'email' => $clientData['email'],
+                'phone' => $clientData['phone'],
                 'password' => Hash::make($clientData['password']),
             ]);
 
             $newClient->save();
 
-            $newClientProfile = new ClientProfile([
-                'first_name' => $clientData['first_name'],
-                'middle_name' => $clientData['middle_name'],
-                'last_name' => $clientData['last_name'],
-                'second_last_name' => $clientData['second_last_name'],
-                'street' => $clientData['street'],
-                'house_number' => $clientData['house_number'],
-                'neighborhood' => $clientData['neighborhood'],
-                'city' => $clientData['city'],
-                'state' => $clientData['state'],
-                'postal_code' => $clientData['postal_code'],
-                'country' => $clientData['country'],
-                'phone' => $clientData['phone'],
-                'date_of_birth' => $clientData['date_of_birth'],
-                'date_of_first_visit' => $clientData['date_of_first_visit'],
-                'client_id' => $newClient->id,
-            ]);
+            $clientData['client_id'] = $newClient->id;
+            $newClientProfile = new ClientProfile($clientData);
 
             $newClientProfile->save();
 

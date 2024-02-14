@@ -21,7 +21,6 @@ class ClientProfile extends Model
         'state',
         'postal_code',
         'country',
-        'phone',
         'date_of_birth',
         'date_of_first_visit',
         'number_of_visits',
@@ -31,5 +30,10 @@ class ClientProfile extends Model
 
     public function user(){
         return $this->belongsTo(User::class);
+    }
+
+    public function profileImage()
+    {
+        return $this->hasOne(ClientProfileImage::class);
     }
 }

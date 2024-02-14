@@ -26,6 +26,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'verification_token',
     ];
 
     /**
@@ -36,11 +37,13 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
-        'passcode'
+        'passcode',
+        'verification_token'
     ];
 
     protected $appends = [
         'role_names',
+        'profile_image_url',
     ];
 
     /**
@@ -54,19 +57,31 @@ class User extends Authenticatable
     ];
 
     // Relacion uno a uno
-    public function profile(){
+    public function profile()
+    {
         return $this->hasOne(UserProfile::class);
     }
 
-    public function roleNames(): Attribute {
+    public function roleNames(): Attribute
+    {
         return new Attribute(
             get: fn () => $this->roles()->pluck('name')->toArray() ?? []
         );
     }
 
-    public function isAdmin(): Attribute {
+    public function isAdmin(): Attribute
+    {
         return new Attribute(
             get: fn () => $this->hasRole('admin')
+        );
+    }
+
+    public function profileImageUrl(): Attribute
+    {
+        return new Attribute(
+            get: fn () => $this->profile && $this->profile->profileImage && $this->profile->profileImage->attachment
+                ? $this->profile->profileImage->attachment->url
+                : null
         );
     }
 }

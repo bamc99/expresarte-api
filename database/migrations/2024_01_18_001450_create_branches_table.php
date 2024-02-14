@@ -14,9 +14,13 @@ return new class extends Migration
         Schema::create('branches', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('phone')->nullable();
+            $table->string('whatsapp')->nullable();
+            $table->string('email')->nullable();
             
             $table->string('street')->nullable();
             $table->string('house_number')->nullable();
+            $table->string('interior_number')->nullable();
             $table->string('neighborhood')->nullable();
             $table->string('city')->nullable();
             $table->string('state')->nullable();

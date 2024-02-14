@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Branch\StoreBranchRequest;
+use App\Models\Attachment;
 use App\Models\Branch;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class BranchController extends Controller
 {
@@ -35,6 +37,39 @@ class BranchController extends Controller
 
         // Puedes devolver una respuesta o redirigir a otra página
         return response()->json(['message' => 'Sucursal creada con éxito'], 201);
+    }
+
+    public function uploadProfileImage(Request $request)
+    {
+        $file = $request->file('image');
+        $originalName = $file->getClientOriginalName();
+        $mime = $file->getClientMimeType();
+        $extension = $file->getClientOriginalExtension();
+        $size = $file->getSize();
+        $hash = hash_file('md5', $file->getRealPath());
+
+        $name = Str::uuid();
+        $pathToSave = "branches/profile-images/";
+        $diskToSave = "public";
+
+        $attachment = Attachment::create([
+            'name' => $name,
+            'original_name' => $originalName,
+            'mime' => $mime,
+            'extension' => $extension,
+            'size' => $size,
+            'sort' => 0,
+            'path' => $pathToSave,
+            'description' => null,
+            'alt' => null,
+            'hash' => $hash,
+            'disk' => $diskToSave,
+            'group' => null,
+        ]);
+
+        $attachment->uploadFile($file);
+
+        return $attachment;
     }
 
     /**

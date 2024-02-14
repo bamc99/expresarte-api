@@ -16,6 +16,7 @@ class UserProfile extends Model
         'second_last_name',
         'street',
         'house_number',
+        'interior_number',
         'neighborhood',
         'city',
         'state',
@@ -33,13 +34,19 @@ class UserProfile extends Model
         'branch_id'
     ];
 
-    public function user(){
+    public function user()
+    {
         return $this->belongsTo(User::class);
     }
 
     // Relacion uno a uno
-    public function branch(){
+    public function branch()
+    {
         return $this->belongsTo(Branch::class, 'branch_id');
     }
 
+    public function profileImage()
+    {
+        return $this->hasOne(UserProfileImage::class);
+    }
 }

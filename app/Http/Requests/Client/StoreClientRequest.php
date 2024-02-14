@@ -27,7 +27,7 @@ class StoreClientRequest extends FormRequest
             'last_name' => ['required', 'string'],
             'second_last_name' => ['required', 'string'],
 
-            'email' => ['required', 'string', 'unique:users,email'],
+            'email' => ['required', 'string', 'unique:clients,email'],
 
             'password' => ['required', 'string', 'min:6'],
 
@@ -39,10 +39,10 @@ class StoreClientRequest extends FormRequest
             'postal_code' => ['required', 'string'],
             'country' => ['required', 'string'],
 
-            'phone' => ['required', 'string'],
+            'phone' => ['required', 'string', 'unique:clients,phone'],
 
-            'date_of_birth' => ['required', 'date'],
-            'date_of_first_visit' => ['required', 'date'],
+            'date_of_birth' => ['date'],
+            'date_of_first_visit' => ['date'],
 
         ];
     }
@@ -74,8 +74,6 @@ class StoreClientRequest extends FormRequest
             'postal_code.required' => 'El campo Código postal es obligatorio.',
             'country.required' => 'El campo País es obligatorio.',
             'phone.required' => 'El campo Teléfono es obligatorio.',
-            'date_of_birth.required' => 'El campo Fecha de nacimiento es obligatorio.',
-            'date_of_first_visit.required' => 'El campo Fecha de primera visita es obligatorio.'
         ];
     }
 }

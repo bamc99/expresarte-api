@@ -26,8 +26,6 @@ return new class extends Migration
             $table->string('postal_code')->nullable();
             $table->string('country')->nullable();
 
-            $table->string('phone')->unique();
-
             $table->date('date_of_birth')->nullable();
             $table->date('date_of_first_visit')->nullable();
 

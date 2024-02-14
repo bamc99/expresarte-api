@@ -18,14 +18,14 @@ return new class extends Migration
             $table->string('description')->nullable();
             $table->string('brand')->nullable();
 
-            $table->double('quantity');
-            $table->string('unit');
+            $table->double('quantity')->nullable();
+            $table->string('unit')->nullable();
 
             $table->double('price');
-            $table->double('cost');
+            $table->double('cost')->nullable();
 
-            $table->integer('stock');
-            $table->integer('reorder_limit');
+            $table->integer('stock')->nullable();
+            $table->integer('reorder_limit')->nullable();
 
             $table->foreignId('product_category_id')->constrained();
 

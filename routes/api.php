@@ -3,6 +3,10 @@
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\BranchController;
 use App\Http\Controllers\ClientController;
+use App\Http\Controllers\Product\ProductCategoryController;
+use App\Http\Controllers\Product\ProductController;
+use App\Http\Controllers\Service\ServiceCategoryController;
+use App\Http\Controllers\Service\ServiceController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -40,12 +44,15 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
         Route::post('/create', [UserController::class, 'store'])->name('users.store');
+        Route::post('/upload-profile-image', [UserController::class, 'uploadProfileImage'])->name('users.uploadProfileImage');
 
     });
 
     Route::prefix('branch')->group(function () {
         Route::get('/', [BranchController::class, 'index'])->name('branches.index');
         Route::post('/create', [BranchController::class, 'store'])->name('branches.store');
+        Route::post('/upload-profile-image', [BranchController::class, 'uploadProfileImage'])->name('branches.uploadProfileImage');
+
     });
 
     Route::prefix('client')->group(function () {
@@ -56,6 +63,24 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/update-profile/{client}', [ClientController::class, 'updateProfile'])->name('clients.updateProfile');
 
         Route::post('/create', [ClientController::class, 'store'])->name('clients.store');
+
+    });
+
+    Route::prefix('product')->group(function () {
+        Route::get('/', [ProductController::class, 'index'])->name('product.index');
+
+        Route::post('/create', [ProductController::class, 'store'])->name('product.store');
+        Route::post('/create-category', [ProductCategoryController::class, 'store'])->name('productCategory.store');
+
+    });
+
+    Route::prefix('service')->group(function () {
+
+        Route::get('/', [ServiceController::class, 'index'])->name('service.index');
+
+
+        Route::post('/create', [ServiceController::class, 'store'])->name('service.store');
+        Route::post('/create-category', [ServiceCategoryController::class, 'store'])->name('serviceCategory.store');
 
     });
 });
